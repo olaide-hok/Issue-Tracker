@@ -1,14 +1,16 @@
 import {useQuery} from 'react-query'
 import {IssueItem} from './IssueItem'
 
-export default function IssuesList({labels}) {
-    const issuesQuery = useQuery(['issues', {labels}], () => {
+export default function IssuesList({labels, status}) {
+    const issuesQuery = useQuery(['issues', {labels, status}], () => {
+        const statusString = status ? `&status=${status}` : ''
         const labelsString = labels
-            .map((labels) => `labels[]=${labels}`)
+            .map((label) => `labels[]=${label}`)
             .join('&')
-        fetch(`/api/issues?${labelsString}`).then((res) => res.json())
+        return fetch(`/api/issues?${labelsString}${statusString}`).then((res) =>
+            res.json()
+        )
     })
-
     return (
         <div>
             <h2>Issues List</h2>
@@ -26,7 +28,7 @@ export default function IssuesList({labels}) {
                             createdBy={issue.createdBy}
                             createdDate={issue.createdDate}
                             labels={issue.labels}
-                            status={issue}
+                            status={issue.status}
                         />
                     ))}
                 </ul>
